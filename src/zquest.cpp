@@ -25658,9 +25658,8 @@ int onCompileScript()
 				break;
 			}
 			
-			std::map<string, ZScript::ScriptType> stypes = result->scriptTypes;
-			std::map<string, disassembled_script_data> scripts = result->theScripts;
-			delete result;
+			std::map<string, ZScript::ScriptType> &stypes = result->scriptTypes;
+			std::map<string, disassembled_script_data> &scripts = result->theScripts;
 			asffcscripts.clear();
 			asffcscripts.push_back("<none>");
 			asglobalscripts.clear();
@@ -25759,6 +25758,8 @@ int onCompileScript()
 			{
 				//fail
 			}
+			delete result; //Delete, regardless of success or failure
+			
 			//Need to manually delete the contents of the map here.
 			//2.53.x has this, to do it:
 			//for(map<string, disassembled_script_data>::iterator it = scripts.begin(); it != scripts.end(); it++)
