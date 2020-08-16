@@ -9,6 +9,7 @@
 #include <sstream>
 
 #include "../ffscript.h"
+#include "../mem_debug.h"
 extern FFScript FFCore;
 
 using std::pair;

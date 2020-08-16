@@ -22,6 +22,7 @@
 #include <string.h>
 #include "gc.h"
 #include "ffscript.h"
+#include "mem_debug.h"
 
 bool show_subscreen_dmap_dots=true;
 bool show_subscreen_numbers=true;

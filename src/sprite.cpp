@@ -24,6 +24,8 @@
 #include "tiles.h"
 #include "particles.h"
 #include "maps.h"
+#include "mem_debug.h"
+
 extern sprite_list particles;
 extern byte                quest_rules[QUESTRULES_NEW_SIZE];
 extern bool get_debug();

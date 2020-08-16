@@ -2636,8 +2636,8 @@ struct script_data
 	
 	~script_data()
 	{
-		if(zasm)
-			delete[] zasm;
+        delete[] zasm;
+        zasm = NULL;
 	}
 	
 	void transfer(script_data& other)

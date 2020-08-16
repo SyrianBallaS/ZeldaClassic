@@ -6,6 +6,7 @@
 #include "Scope.h"
 #include "Types.h"
 #include "AST.h"
+#include "../mem_debug.h"
 
 using namespace std;
 using namespace ZScript;

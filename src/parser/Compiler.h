@@ -90,13 +90,6 @@ namespace ZScript
 
 	struct disassembled_script_data
 	{
-		~disassembled_script_data()
-		{
-			while(!second.empty())
-			{
-				delete second.pop_back();
-			}
-		}
 		zasm_meta first;
 		std::vector<ZScript::Opcode*> second;
 		byte format;

@@ -30,6 +30,7 @@
 #include "zelda.h"
 #include "mem_debug.h"
 #include "zquest.h"
+
 //extern ZModule zcm;
 extern zcmodule moduledata;
 

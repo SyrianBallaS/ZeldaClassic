@@ -17,6 +17,8 @@
 #include <map>
 #include <string>
 
+#include "mem_debug.h"
+
 void editmsg(int index, int addAfter);
 int strlist_del();
 int addtomsglist(int index);

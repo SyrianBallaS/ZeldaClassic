@@ -34,6 +34,7 @@
 #include "defdata.h"
 #include "zc_malloc.h"
 #include "ffscript.h"
+#include "mem_debug.h"
 extern FFScript FFCore;
 
 extern int ex;

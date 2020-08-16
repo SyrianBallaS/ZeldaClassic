@@ -6,6 +6,7 @@
 #include "ffasmexport.h"
 #include "ffasm.h"
 #include "zdefs.h"
+#include "mem_debug.h"
 
 using namespace std;
 

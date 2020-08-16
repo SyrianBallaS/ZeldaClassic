@@ -20,6 +20,7 @@
 #include "BuildVisitors.h"
 #include "RegistrationVisitor.h"
 #include "ZScript.h"
+#include "../mem_debug.h"
 using namespace std;
 using namespace ZScript;
 

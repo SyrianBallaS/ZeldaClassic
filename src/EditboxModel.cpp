@@ -14,6 +14,8 @@
 #include "gui.h"
 #include <stdio.h>
 
+#include "mem_debug.h"
+
 extern FONT *lfont, *sfont3;
 extern FONT *pfont;
 extern bool is_large;

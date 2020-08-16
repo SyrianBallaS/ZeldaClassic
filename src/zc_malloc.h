@@ -12,7 +12,7 @@
 // -memory leaks from malloc calls.
 // -unanswered prayers to babylonian gods.
 
-
+// Linker errors if 1
 #define ZC_DEBUG_MALLOC_ENABLED 0
 
 

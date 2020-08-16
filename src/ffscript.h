@@ -224,7 +224,7 @@ struct user_bitmap
 	{
 		return (flags & UBMPFLAG_RESERVED) ? true : false;
 	}
-	void free()
+	void Free()
 	{
 		flags |= UBMPFLAG_FREEING;
 	}

@@ -25441,7 +25441,7 @@ void FFScript::do_deallocate_bitmap()
 	user_bitmap* b = checkBitmap(ri->bitmapref, "Free()", false, true);
 	if(b)
 	{
-		b->free();
+		b->Free();
 	}
 }
 

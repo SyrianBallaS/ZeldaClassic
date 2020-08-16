@@ -30,6 +30,7 @@
 #include "zq_misc.h"
 #include "zq_cset.h"
 #include "zq_class.h"
+#include "mem_debug.h"
 
 extern int d_dummy_proc(int msg,DIALOG *d,int c);
 extern int d_dropdmaplist_proc(int msg,DIALOG *d,int c);

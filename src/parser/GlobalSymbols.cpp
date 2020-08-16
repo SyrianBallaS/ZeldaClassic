@@ -8,6 +8,7 @@
 #include "Scope.h"
 #include "ZScript.h"
 #include "CompilerUtils.h"
+#include "../mem_debug.h"
 
 #define MAXDMAPS         512
 #define MAXLEVELS        512	

@@ -5,6 +5,7 @@
 #include "Scope.h"
 #include "Types.h"
 #include "CompileError.h"
+#include "../mem_debug.h"
 
 using std::string;
 using std::vector;

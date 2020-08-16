@@ -10,6 +10,11 @@
 #include <string>
 #include <cstdarg>
 
+// very hackish but this file sucks, mem_debug.h is re-included at the end
+#ifdef _DEBUG
+#undef new
+#endif // _DEBUG
+
 ////////////////////////////////////////////////////////////////
 // Strings
 
@@ -333,5 +338,10 @@ Value findLargest(
 	}
 	return largest;
 }
+
+// No other way
+#ifdef _DEBUG
+#include "../mem_debug.h"
+#endif // _DEBUG
 
 #endif

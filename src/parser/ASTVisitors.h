@@ -212,7 +212,7 @@ namespace ZScript
 		static void* const paramReadWrite;
 		
 		RecursiveVisitor() : failure(false), failure_halt(false), failure_temp(false), breakNode(NULL) {}
-	
+
 		// Mark as having failed.
 		void fail() {failure = true;}
 	

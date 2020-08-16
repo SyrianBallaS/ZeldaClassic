@@ -6,7 +6,7 @@
 #include "CompileError.h"
 #include "Types.h"
 #include "ZScript.h"
-
+#include "../mem_debug.h"
 using namespace ZScript;
 using namespace std;
 

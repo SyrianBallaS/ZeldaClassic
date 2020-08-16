@@ -17,9 +17,9 @@
 #define MIDI_TRACK_BUFFER_SIZE 50
 
 #include "precompiled.h" //always first
+
 #include <memory>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sstream>
 #include <ctype.h>
@@ -23953,12 +23953,13 @@ void build_biitems_list()
     
     for(int i = 0; i < NUMSCRIPTITEM - 1; i++, biitems_cnt++)
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         
         if(!itemmap[i].isEmpty())
             ss << itemmap[i].scriptname << " (" << i+1 << ")";
-            
-        biitems[biitems_cnt].first = ss.str();
+        
+        const std::string str = ss.str();
+        biitems[biitems_cnt].first = str;
         biitems[biitems_cnt].second = i;
     }
     
@@ -30241,8 +30242,9 @@ long exittimer = 10000, exittimer2 = 100;
 
 int main(int argc,char **argv)
 { 
-    
-	
+#if (defined(_DEBUG) && defined(_MSC_VER))
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif // (defined(_DEBUG) && defined(_MSC_VER))
 	if ( V_ZC_ALPHA )
 	{
 		Z_title("%s, v.%s Alpha %d",ZQ_EDITOR_NAME, ZQ_EDITOR_V, V_ZC_ALPHA);
@@ -32745,6 +32747,9 @@ int main(int argc,char **argv)
         
     allegro_exit();
     
+#if (defined(_DEBUG) && defined(_MSC_VER))
+    _CrtDumpMemoryLeaks();
+#endif // (defined(_DEBUG) && defined(_MSC_VER))
     return 0;
 // memset(qtpathtitle,0,10);//UNREACHABLE
 }

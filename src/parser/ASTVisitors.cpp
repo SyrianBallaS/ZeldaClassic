@@ -7,7 +7,7 @@
 #include "parserDefs.h"
 #include <assert.h>
 #include <cstdarg>
-
+#include "../mem_debug.h"
 using std::list;
 using std::vector;
 using namespace ZScript;
@@ -74,12 +74,18 @@ void RecursiveVisitor::handleError(CompileError const& error)
 
 void RecursiveVisitor::visit(AST& node, void* param)
 {
-	if(node.isDisabled()) return; //Don't visit disabled nodes.
-	if (breakRecursion(node, param)) return;
+	if (node.isDisabled()) { 
+		return; //Don't visit disabled nodes 
+	}
+	if (breakRecursion(node, param)) { 
+		return; 
+	}
 	recursionStack.push_back(&node);
 	node.execute(*this, param);
 	recursionStack.pop_back();
-	if (breakNode == &node) breakNode = NULL;
+	if (breakNode == &node) {
+		breakNode = NULL; 
+	}
 }
 
 void RecursiveVisitor::visit(AST* node, void* param)

@@ -8,6 +8,7 @@
 #include "Types.h"
 #include "Scope.h"
 #include "../ffscript.h"
+#include "../mem_debug.h"
 extern FFScript FFCore;
 
 using namespace std;

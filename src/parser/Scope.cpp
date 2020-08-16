@@ -7,6 +7,7 @@
 #include "GlobalSymbols.h"
 #include "Types.h"
 #include "ZScript.h"
+#include "../mem_debug.h"
 
 using namespace std;
 using namespace ZScript;
