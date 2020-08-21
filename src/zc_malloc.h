@@ -38,6 +38,9 @@ extern void  __zc_debug_malloc_free_print_memory_leaks();
 
 void __zc_always_assert(bool e, const char* expression, const char* file, int line);
 
+#define DELETE_S(ptr) if (NULL != ptr) { delete ptr; ptr = NULL; }
+#define DELETE_ARRAY_S(arr, size) if (NULL != arr) { delete[] arr; std::memset(arr, 0, size); }
+
 #endif
 
 

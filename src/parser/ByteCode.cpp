@@ -1884,13 +1884,13 @@ string LabelArgument::toString()
 {
     if(!haslineno)
     {
-        char temp[40];
+		char temp[40] = {};
         sprintf(temp, "l%d", ID);
         return string(temp);
     }
     else
     {
-        char temp[40];
+		char temp[40] = {};
         sprintf(temp, "%d", lineno);
         return string(temp);
     }

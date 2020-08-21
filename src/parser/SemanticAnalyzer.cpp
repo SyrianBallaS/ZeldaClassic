@@ -6,6 +6,7 @@
 #include "Types.h"
 #include "CompileError.h"
 #include "../mem_debug.h"
+#include "../zc_malloc.h"
 
 using std::string;
 using std::vector;
@@ -563,6 +564,7 @@ void SemanticAnalyzer::caseDataDecl(ASTDataDecl& host, void*)
 		if (breakRecursion(host)) return;
 
 		// TODO check for array casting here.
+		DELETE_S(temp);
 	}	
 }
 

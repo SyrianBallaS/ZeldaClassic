@@ -2634,7 +2634,7 @@ int parse_script_file(script_data **script, FILE* fscript, bool report_success)
 	stop = false;
 	meta_done = false;
 	
-	if((*script)!=NULL) delete (*script);
+	DELETE_S(*script);
 	(*script) = new script_data(num_commands);
 	
 	//(*script) = new ffscript[num_commands];
