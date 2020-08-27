@@ -6,6 +6,14 @@
 //globally remove extraneous bullshit
 //
 
+// Boost
+#include <boost/any.hpp>
+#include <boost/array.hpp>
+#include <boost/optional.hpp>
+#include <boost/smart_ptr.hpp>
+#include <boost/variant.hpp>
+#include <boost/move/unique_ptr.hpp>
+#include <boost/move/make_unique.hpp>
 
 //c standard lib
 #include <math.h>
@@ -28,8 +36,6 @@
 
 //zc
 #include "zc_malloc.h"
-
-
 
 #endif
 
