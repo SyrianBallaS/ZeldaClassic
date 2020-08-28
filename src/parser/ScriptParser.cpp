@@ -54,7 +54,7 @@ ScriptsData* ZScript::compile(string const& filename)
 	box_out("Pass 1: Parsing");
 	box_eol();
 
-	auto_ptr<ASTFile> root(parseFile(filename));
+	boost::movelib::unique_ptr<ASTFile> root(parseFile(filename));
 	if (!root.get())
 	{
 		box_out_err(CompileError::CantOpenSource(NULL));
@@ -95,7 +95,7 @@ ScriptsData* ZScript::compile(string const& filename)
 	box_out("Pass 5: Generating object code");
 	box_eol();
     
-	auto_ptr<IntermediateData> id(ScriptParser::generateOCode(fd));
+	boost::movelib::unique_ptr<IntermediateData> id(ScriptParser::generateOCode(fd));
 	if (!id.get())
 		return NULL;
     
@@ -183,7 +183,7 @@ bool ScriptParser::preprocess_one(ASTImportDecl& importDecl, int reclimit)
 		box_out_err(CompileError::CantOpenImport(&importDecl, filename));
 		return false;
 	}
-	auto_ptr<ASTFile> imported(parseFile(filename));
+	boost::movelib::unique_ptr<ASTFile> imported(parseFile(filename));
 	if (!imported.get())
 	{
 		box_out_err(CompileError::CantParseImport(&importDecl, filename));
