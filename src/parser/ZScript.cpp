@@ -451,6 +451,7 @@ vector<Opcode*> Function::takeCode()
 void Function::giveCode(vector<Opcode*>& code)
 {
 	appendElements(ownedCode, code);
+	//::deleteElements(code);
 	code.clear();
 }
 

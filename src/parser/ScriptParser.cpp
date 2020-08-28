@@ -47,7 +47,7 @@ void ScriptParser::initialize()
 	CompileOption::initialize();
 }
 
-ScriptsData* ZScript::compile(string const& filename)
+boost::movelib::unique_ptr<ScriptsData> ZScript::compile(string const& filename)
 {
     ScriptParser::initialize();
 
@@ -104,12 +104,12 @@ ScriptsData* ZScript::compile(string const& filename)
 
 	ScriptParser::assemble(id.get());
 
-	ScriptsData* result = new ScriptsData(program);
+	boost::movelib::unique_ptr<ScriptsData> ret(new ScriptsData(program));
     
 	box_out("Success!");
 	box_eol();
 
-	return result;
+	return boost::movelib::unique_ptr<ScriptsData>(ret.release());
 }
 
 int ScriptParser::vid = 0;
@@ -220,7 +220,7 @@ bool ScriptParser::preprocess(ASTFile* root, int reclimit)
 	return true;
 }
 
-IntermediateData* ScriptParser::generateOCode(FunctionData& fdata)
+boost::movelib::unique_ptr<IntermediateData> ScriptParser::generateOCode(FunctionData& fdata)
 {
 	Program& program = fdata.program;
 	Scope* scope = &program.getScope();
@@ -232,7 +232,7 @@ IntermediateData* ScriptParser::generateOCode(FunctionData& fdata)
     
 	//we now have labels for the functions and ids for the global variables.
 	//we can now generate the code to intialize the globals
-	IntermediateData *rval = new IntermediateData(fdata);
+	boost::movelib::unique_ptr<IntermediateData> rval = boost::movelib::make_unique<IntermediateData>(fdata);
     
 	// Push 0s for init stack space.
 	/* Why? The stack should already be init'd to all 0, anyway?
@@ -440,12 +440,11 @@ IntermediateData* ScriptParser::generateOCode(FunctionData& fdata)
     
 	if (failure)
 	{
-		delete rval;
-		return NULL;
+		rval.reset(NULL);
 	}
     
 	//Z_message("yes");
-	return rval;
+	return boost::movelib::unique_ptr<IntermediateData>(rval.release());
 }
 
 void ScriptParser::assemble(IntermediateData *id)

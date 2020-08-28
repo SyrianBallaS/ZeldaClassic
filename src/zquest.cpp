@@ -25563,7 +25563,7 @@ int onCompileScript()
 			fclose(tempfile);
 			box_start(1, "Compile Progress", lfont, sfont,true);
 			gotoless_not_equal = (0 != get_bit(quest_rules, qr_GOTOLESSNOTEQUAL)); // Used by BuildVisitors.cpp
-			ZScript::ScriptsData *result = ZScript::compile("tmp");
+			boost::movelib::unique_ptr<ZScript::ScriptsData> result(ZScript::compile("tmp"));
 			unlink("tmp");
 			if ( result )
 			{
@@ -25759,7 +25759,7 @@ int onCompileScript()
 			{
 				//fail
 			}
-			delete result; //Delete, regardless of success or failure
+			result.reset(NULL); //Delete, regardless of success or failure
 			
 			//Need to manually delete the contents of the map here.
 			//2.53.x has this, to do it:
@@ -30243,7 +30243,9 @@ long exittimer = 10000, exittimer2 = 100;
 int main(int argc,char **argv)
 { 
 #if (defined(_DEBUG) && defined(_MSC_VER))
+#if (VLD_FORCE_ENABLE == 0)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif // (VLD_FORCE_ENABLE == 0)
 #endif // (defined(_DEBUG) && defined(_MSC_VER))
 	if ( V_ZC_ALPHA )
 	{
@@ -32748,7 +32750,9 @@ int main(int argc,char **argv)
     allegro_exit();
     
 #if (defined(_DEBUG) && defined(_MSC_VER))
+#if (VLD_FORCE_ENABLE == 0)
     _CrtDumpMemoryLeaks();
+#endif // (VLD_FORCE_ENABLE == 0)
 #endif // (defined(_DEBUG) && defined(_MSC_VER))
     return 0;
 // memset(qtpathtitle,0,10);//UNREACHABLE

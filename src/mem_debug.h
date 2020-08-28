@@ -13,6 +13,8 @@
 
 #pragma once
 
+#if (VLD_FORCE_ENABLE == 0)
+
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
@@ -56,7 +58,7 @@ inline static void InitCrtDebug(int flags = 0)
 	}*/
 #endif //_MSC_VER
 #endif //TK_HEADER_NO_DEBUG_REMAP
-
+#endif // !(VLD_FORCE_ENABLE == 0)
 
 
 #endif

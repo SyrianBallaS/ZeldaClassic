@@ -6,14 +6,21 @@
 //globally remove extraneous bullshit
 //
 
+// Need to pretend we don't have C++11 support
+#define BOOST_NO_CXX11_VARIADIC_TEMPLATES
+#define BOOST_NO_CXX11_DELETED_FUNCTIONS
+#define BOOST_NO_CXX11_RVALUE_REFERENCES
+#define BOOST_NO_CXX11_DECLTYPE
+#define BOOST_NO_CXX11_NULLPTR
+
 // Boost
-#include <boost/any.hpp>
-#include <boost/array.hpp>
-#include <boost/optional.hpp>
-#include <boost/smart_ptr.hpp>
-#include <boost/variant.hpp>
-#include <boost/move/unique_ptr.hpp>
-#include <boost/move/make_unique.hpp>
+#include <../boost/boost/any.hpp>
+#include <../boost/boost/array.hpp>
+#include <../boost/boost/optional.hpp>
+#include <../boost/boost/smart_ptr.hpp>
+#include <../boost/boost/variant.hpp>
+#include <../boost/boost/move/unique_ptr.hpp>
+#include <../boost/boost/move/make_unique.hpp>
 
 //c standard lib
 #include <math.h>
@@ -38,6 +45,7 @@
 #include "zc_malloc.h"
 
 //Mem Debug
+#define VLD_FORCE_ENABLE 1
 #include "../vld/src/vld.h"
 #endif
 
