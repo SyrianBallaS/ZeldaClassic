@@ -29,6 +29,8 @@
 //zc
 #include "zc_malloc.h"
 
+//Mem Debug
+#include "../vld/src/vld.h"
 
 
 #endif
