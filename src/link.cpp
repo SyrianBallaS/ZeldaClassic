@@ -8503,13 +8503,43 @@ bool LinkClass::startwpn(int itemid)
                     use_hookshot=false;
                 }
             }
+	    //Diagonal Hookshot (6)
+	    else if(dir==r_down)
+            {
+                if((combobuf[MAPCOMBO2(i,x+9,y+13)].type==cHSGRAB))
+                {
+                    use_hookshot=false;
+                }
+            }
+	    else if(dir==l_down)
+            {
+                if((combobuf[MAPCOMBO2(i,x+6,y+13)].type==cHSGRAB))
+                {
+                    use_hookshot=false;
+                }
+            }
+	    else if(dir==r_up)
+            {
+                if((combobuf[MAPCOMBO2(i,x+9,y+13)].type==cHSGRAB))
+                {
+                    use_hookshot=false;
+                }
+            }
+	    else if(dir==l_up)
+            {
+                if((combobuf[MAPCOMBO2(i,x+6,y+13)].type==cHSGRAB))
+                {
+                    use_hookshot=false;
+                }
+            }
         }
         
         if(use_hookshot)
         {
             int hookitem = itemsbuf[itemid].fam_type;
             int hookpower = itemsbuf[itemid].power;
-            
+            byte allow_diagonal = (itemsbuf[itemid].flags & ITEM_FLAG2) ? 1 : 0; 
+		
             if(!Lwpns.has_space())
             {
                 Lwpns.del(0);
@@ -8564,7 +8594,49 @@ bool LinkClass::startwpn(int itemid)
                 hs_startx=wx+4;
                 hs_starty=wy;
             }
-            
+            //Diagonal Hookshot (7)
+	    if(dir==r_down)
+            {
+                hookshot_used=true;
+		int offset=get_bit(quest_rules,qr_HOOKSHOTDOWNBUG)?4:0;
+                Lwpns.add(new weapon((zfix)wx,(zfix)wy+offset,(zfix)wz,wHSHandle,hookitem,
+                                     hookpower*DAMAGE_MULTIPLIER,dir,itemid,getUID(),false,false,true));
+                Lwpns.add(new weapon((zfix)(wx+4),(zfix)wy+offset,(zfix)wz,wHookshot,hookitem,
+                                     hookpower*DAMAGE_MULTIPLIER,dir,itemid,getUID(),false,false,true));
+                hs_startx=wx+4;
+                hs_starty=wy;
+            }
+	    if(dir==r_up)
+            {
+                hookshot_used=true;
+                Lwpns.add(new weapon((zfix)wx,(zfix)wy,(zfix)wz,wHSHandle,hookitem,
+                                     hookpower*DAMAGE_MULTIPLIER,dir,itemid,getUID(),false,false,true));
+                Lwpns.add(new weapon((zfix)(wx+4),(zfix)wy,(zfix)wz,wHookshot,hookitem,
+                                     hookpower*DAMAGE_MULTIPLIER,dir,itemid,getUID(),false,false,true));
+                hs_startx=wx+4;
+                hs_starty=wy;
+            }
+	    if(dir==l_down)
+            {
+                hookshot_used=true;
+		int offset=get_bit(quest_rules,qr_HOOKSHOTDOWNBUG)?4:0;
+                Lwpns.add(new weapon((zfix)wx,(zfix)wy+offset,(zfix)wz,wHSHandle,hookitem,
+                                     hookpower*DAMAGE_MULTIPLIER,dir,itemid,getUID(),false,false,true));
+                Lwpns.add(new weapon((zfix)(wx-4),(zfix)wy+offset,(zfix)wz,wHookshot,hookitem,
+                                     hookpower*DAMAGE_MULTIPLIER,dir,itemid,getUID(),false,false,true));
+                hs_startx=wx+4;
+                hs_starty=wy;
+            }
+	    if(dir==l_up)
+            {
+                hookshot_used=true;
+                Lwpns.add(new weapon((zfix)wx,(zfix)wy,(zfix)wz,wHSHandle,hookitem,
+                                     hookpower*DAMAGE_MULTIPLIER,dir,itemid,getUID(),false,false,true));
+                Lwpns.add(new weapon((zfix)(wx-4),(zfix)wy,(zfix)wz,wHookshot,hookitem,
+                                     hookpower*DAMAGE_MULTIPLIER,dir,itemid,getUID(),false,false,true));
+                hs_startx=wx+4;
+                hs_starty=wy;
+            }
             hookshot_frozen=true;
         }
         
@@ -14580,13 +14652,62 @@ bool usekey()
         if(game->lvlkeys[dlevel]!=0)
         {
             game->lvlkeys[dlevel]--;
-            return true;
+	    //run script for level key item
+		int key_item = 0; //current_item_id(itype_lkey); //not possible
+		for ( int q = 0; q < MAXITEMS; ++q )
+		{
+			if ( itemsbuf[q].family == itype_lkey )
+			{
+				key_item = q; break;
+			}
+		}
+		//zprint2("key_item is: %d\n",key_item);
+		//zprint2("key_item script is: %d\n",itemsbuf[key_item].script);
+		if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+		{
+			ri = &(itemScriptData[key_item]);
+			for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+			ri->Clear();
+			item_doscript[key_item] = 1;
+			itemscriptInitialised[key_item] = 0;
+			ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+			FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+		}
+		return true;
         }
         
-        if(game->get_keys()==0)
-            return false;
-            
-        game->change_keys(-1);
+	else
+	{
+		if(game->get_keys()==0)
+		{
+		    return false;
+		}
+		else 
+		{
+			//run script for key item
+			int key_item = 0; //current_item_id(itype_key); //not possible
+			for ( int q = 0; q < MAXITEMS; ++q )
+			{
+				if ( itemsbuf[q].family == itype_key )
+				{
+					key_item = q; break;
+				}
+			}
+			//zprint2("key_item is: %d\n",key_item);
+			//zprint2("key_item script is: %d\n",itemsbuf[key_item].script);
+			if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+			{
+				ri = &(itemScriptData[key_item]);
+				for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+				ri->Clear();
+				item_doscript[key_item] = 1;
+				itemscriptInitialised[key_item] = 0;
+				ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+				FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+			}
+			game->change_keys(-1);
+		}
+	}
     }
     
     return true;
@@ -14835,6 +14956,27 @@ void LinkClass::checkbosslockblock()
     }
     
     if(!(game->lvlitems[dlevel]&liBOSSKEY)) return;
+	
+    
+	// Run Boss Key Script
+	int key_item = 0; //current_item_id(itype_bosskey); //not possible
+	for ( int q = 0; q < MAXITEMS; ++q )
+	{
+		if ( itemsbuf[q].family == itype_bosskey )
+		{
+			key_item = q; break;
+		}
+	}
+	if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+	{
+		ri = &(itemScriptData[key_item]);
+		for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+		ri->Clear();
+		item_doscript[key_item] = 1;
+		itemscriptInitialised[key_item] = 0;
+		ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+		FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+	}
     
     setmapflag(mBOSSLOCKBLOCK);
     remove_bosslockblocks((currscr>=128)?1:0);
@@ -14908,7 +15050,25 @@ void LinkClass::checkchest(int type)
         
     case cBOSSCHEST:
         if(!(game->lvlitems[dlevel]&liBOSSKEY)) return;
-        
+        // Run Boss Key Script
+	int key_item = 0; //current_item_id(itype_bosskey); //not possible
+	for ( int q = 0; q < MAXITEMS; ++q )
+	{
+		if ( itemsbuf[q].family == itype_bosskey )
+		{
+			key_item = q; break;
+		}
+	}
+	if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+	{
+		ri = &(itemScriptData[key_item]);
+		for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+		ri->Clear();
+		item_doscript[key_item] = 1;
+		itemscriptInitialised[key_item] = 0;
+		ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+		FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+	}
         setmapflag(mBOSSCHEST);
         break;
     }
@@ -14999,6 +15159,25 @@ void LinkClass::checklocked()
 					    setmapflag(di, mDOOR_DOWN);
 					sfx(WAV_DOOR);
 					markBmap(-1);
+					// Run Boss Key Script
+					int key_item = 0; //current_item_id(itype_bosskey); //not possible
+					for ( int q = 0; q < MAXITEMS; ++q )
+					{
+						if ( itemsbuf[q].family == itype_bosskey )
+						{
+							key_item = q; break;
+						}
+					}
+					if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+					{
+						ri = &(itemScriptData[key_item]);
+						for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+						ri->Clear();
+						item_doscript[key_item] = 1;
+						itemscriptInitialised[key_item] = 0;
+						ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+						FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+					}
 				    }
 				    else return;
 
@@ -15039,6 +15218,25 @@ void LinkClass::checklocked()
 					    setmapflag(di, mDOOR_UP);
 					sfx(WAV_DOOR);
 					markBmap(-1);
+					// Run Boss Key Script
+					int key_item = 0; //current_item_id(itype_bosskey); //not possible
+					for ( int q = 0; q < MAXITEMS; ++q )
+					{
+						if ( itemsbuf[q].family == itype_bosskey )
+						{
+							key_item = q; break;
+						}
+					}
+					if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+					{
+						ri = &(itemScriptData[key_item]);
+						for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+						ri->Clear();
+						item_doscript[key_item] = 1;
+						itemscriptInitialised[key_item] = 0;
+						ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+						FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+					}
 				    }
 				    else return;
 				}
@@ -15077,6 +15275,25 @@ void LinkClass::checklocked()
 					    setmapflag(di, mDOOR_RIGHT);
 					sfx(WAV_DOOR);
 					markBmap(-1);
+					// Run Boss Key Script
+					int key_item = 0; //current_item_id(itype_bosskey); //not possible
+					for ( int q = 0; q < MAXITEMS; ++q )
+					{
+						if ( itemsbuf[q].family == itype_bosskey )
+						{
+							key_item = q; break;
+						}
+					}
+					if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+					{
+						ri = &(itemScriptData[key_item]);
+						for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+						ri->Clear();
+						item_doscript[key_item] = 1;
+						itemscriptInitialised[key_item] = 0;
+						ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+						FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+					}
 				    }
 				    else return;
 				}
@@ -15119,6 +15336,25 @@ void LinkClass::checklocked()
 					    setmapflag(di, mDOOR_LEFT);
 					sfx(WAV_DOOR);
 					markBmap(-1);
+					// Run Boss Key Script
+					int key_item = 0; //current_item_id(itype_bosskey); //not possible
+					for ( int q = 0; q < MAXITEMS; ++q )
+					{
+						if ( itemsbuf[q].family == itype_bosskey )
+						{
+							key_item = q; break;
+						}
+					}
+					if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+					{
+						ri = &(itemScriptData[key_item]);
+						for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+						ri->Clear();
+						item_doscript[key_item] = 1;
+						itemscriptInitialised[key_item] = 0;
+						ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+						FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+					}
 				    }
 				    else return;
 				}
@@ -15167,6 +15403,25 @@ void LinkClass::checklocked()
 						    setmapflag(di, mDOOR_DOWN);
 						sfx(WAV_DOOR);
 						markBmap(-1);
+						// Run Boss Key Script
+						int key_item = 0; //current_item_id(itype_bosskey); //not possible
+						for ( int q = 0; q < MAXITEMS; ++q )
+						{
+							if ( itemsbuf[q].family == itype_bosskey )
+							{
+								key_item = q; break;
+							}
+						}
+						if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+						{
+							ri = &(itemScriptData[key_item]);
+							for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+							ri->Clear();
+							item_doscript[key_item] = 1;
+							itemscriptInitialised[key_item] = 0;
+							ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+							FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+						}
 					    }
 					    else return;
 					}
@@ -15215,6 +15470,25 @@ void LinkClass::checklocked()
 						    setmapflag(di, mDOOR_UP);
 						sfx(WAV_DOOR);
 						markBmap(-1);
+						// Run Boss Key Script
+						int key_item = 0; //current_item_id(itype_bosskey); //not possible
+						for ( int q = 0; q < MAXITEMS; ++q )
+						{
+							if ( itemsbuf[q].family == itype_bosskey )
+							{
+								key_item = q; break;
+							}
+						}
+						if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+						{
+							ri = &(itemScriptData[key_item]);
+							for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+							ri->Clear();
+							item_doscript[key_item] = 1;
+							itemscriptInitialised[key_item] = 0;
+							ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+							FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+						}
 					    }
 					    else return;
 					}
@@ -15261,6 +15535,25 @@ void LinkClass::checklocked()
 						    setmapflag(di, mDOOR_RIGHT);
 						sfx(WAV_DOOR);
 						markBmap(-1);
+						// Run Boss Key Script
+						int key_item = 0; //current_item_id(itype_bosskey); //not possible
+						for ( int q = 0; q < MAXITEMS; ++q )
+						{
+							if ( itemsbuf[q].family == itype_bosskey )
+							{
+								key_item = q; break;
+							}
+						}
+						if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) 
+						{
+							ri = &(itemScriptData[key_item]);
+							for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+							ri->Clear();
+							item_doscript[key_item] = 1;
+							itemscriptInitialised[key_item] = 0;
+							ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+							FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+						}
 					    }
 					    else return;
 					}
@@ -15310,6 +15603,25 @@ void LinkClass::checklocked()
 						    setmapflag(di, mDOOR_LEFT);
 						sfx(WAV_DOOR);
 						markBmap(-1);
+						// Run Boss Key Script
+						int key_item = 0; //current_item_id(itype_bosskey); //not possible
+						for ( int q = 0; q < MAXITEMS; ++q )
+						{
+							if ( itemsbuf[q].family == itype_bosskey )
+							{
+								key_item = q; break;
+							}
+						}
+						if ( key_item > 0 && itemsbuf[key_item].script && !item_doscript[key_item] ) //
+						{
+							ri = &(itemScriptData[key_item]);
+							for ( int q = 0; q < 1024; q++ ) item_stack[key_item][q] = 0xFFFF;
+							ri->Clear();
+							item_doscript[key_item] = 1;
+							itemscriptInitialised[key_item] = 0;
+							ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[key_item].script, key_item);
+							FFCore.deallocateAllArrays(SCRIPT_ITEM,(key_item));
+						}
 
 					    }
 					    else return;
@@ -21522,12 +21834,17 @@ void dospecialmoney(int index)
     case rINFO:                                             // pay for info
         if(prices[priceindex]!=100000 ) // 100000 is a placeholder price for free items
         {
-            if (game->get_spendable_rupies() < abs(prices[priceindex]) && !current_item_power(itype_wallet))
-                return;
+            
                 
             if(!current_item_power(itype_wallet))
 	    {
-                game->change_drupy(-abs(prices[priceindex]));
+		if (game->get_spendable_rupies() < abs(prices[priceindex])) 
+			return;
+		int tmpprice = -abs(prices[priceindex]);
+		int total = game->get_drupy()-tmpprice;
+		total = vbound(total, 0, game->get_maxcounter(1)); //Never overflow! Overflow here causes subscreen bugs! -Z
+		game->set_drupy(game->get_drupy()-total);
+		//game->change_drupy(-abs(prices[priceindex]));
 	    }
 	    if ( current_item_power(itype_wallet)>0 )
 	    {
@@ -21559,6 +21876,7 @@ void dospecialmoney(int index)
         prices[0] = tmpscr[tmp].catchall;
         if (!current_item_power(itype_wallet))
             game->change_drupy(prices[0]);
+	//game->set_drupy(game->get_drupy()+price); may be needed everywhere
 
         putprices(false);
         setmapflag();
@@ -21574,7 +21892,7 @@ void dospecialmoney(int index)
         for(int i=0; i<3; i++)
             prices[i]=gambledat[si++];
             
-        game->change_drupy(prices[priceindex]);
+	game->set_drupy(game->get_drupy()+prices[priceindex]);
         putprices(true);
         
         for(int i=1; i<4; i++)
@@ -21597,7 +21915,10 @@ void dospecialmoney(int index)
 				price+=itemsbuf[wmedal].misc1;
 		}
 		
-        game->change_drupy(price);
+	int total = game->get_drupy()-price;
+	total = vbound(total, 0, game->get_maxcounter(1)); //Never overflow! Overflow here causes subscreen bugs! -Z
+	game->set_drupy(game->get_drupy()-total);
+        //game->set_drupy(game->get_drupy()+price);
         setmapflag();
         game->change_maxbombs(4);
         game->set_bombs(game->get_maxbombs());
@@ -21640,7 +21961,11 @@ void dospecialmoney(int index)
 				price+=itemsbuf[wmedal].misc1;
 		}
 		
-        game->change_drupy(price);
+	int total = game->get_drupy()-price;
+	total = vbound(total, 0, game->get_maxcounter(1)); //Never overflow! Overflow here causes subscreen bugs! -Z
+	game->set_drupy(game->get_drupy()-total);
+
+	//game->set_drupy(game->get_drupy()+price);
         setmapflag();
         game->change_maxarrows(10);
         game->set_arrows(game->get_maxarrows());
@@ -21659,8 +21984,10 @@ void dospecialmoney(int index)
         {
             if(game->get_spendable_rupies()<abs(tmpscr[tmp].catchall) && !current_item_power(itype_wallet))
                 return;
-                
-            game->change_drupy(-abs(tmpscr[tmp].catchall));
+	    int tmpprice = -abs(tmpscr[tmp].catchall);
+	    int total = game->get_drupy()-tmpprice;
+	    total = vbound(total, 0, game->get_maxcounter(1)); //Never overflow! Overflow here causes subscreen bugs! -Z
+	    game->set_drupy(game->get_drupy()-total);
         }
         else
         {
@@ -22036,14 +22363,17 @@ void LinkClass::checkitems(int index)
         case rSHOP:                                           // shop
             if(prices[PriceIndex]!=100000) // 100000 is a placeholder price for free items
             {
-                if(game->get_spendable_rupies()<abs(prices[PriceIndex]) && !current_item_power(itype_wallet))
-                    return;
                 
-                if(!current_item_power(itype_wallet))
+		if(!current_item_power(itype_wallet))
 		{
-                    game->change_drupy(-abs(prices[PriceIndex]));
+			if( game->get_spendable_rupies()<abs(prices[PriceIndex]) ) return;
+			int tmpprice = -abs(prices[PriceIndex]);
+			//game->change_drupy(-abs(prices[priceindex]));
+			int total = game->get_drupy()-tmpprice;
+			total = vbound(total, 0, game->get_maxcounter(1)); //Never overflow! Overflow here causes subscreen bugs! -Z
+			game->set_drupy(game->get_drupy()-total);
 		}
-		 if(current_item_power(itype_wallet))
+		else //infinite wallet
 		{
                     game->change_drupy(0);
 		}
@@ -22327,6 +22657,8 @@ void LinkClass::checkitems(int index)
 		switch(tmpscr[tmp].room)
 		{
 			case rSHOP: 
+			case rP_SHOP: 
+			case rTAKEONE: 
 			{
 				if ( PriceIndex >= 0 )
 				{
@@ -22365,10 +22697,14 @@ void LinkClass::checkitems(int index)
     
     if(itemsbuf[id2].family==itype_triforcepiece)
     {
-        if(itemsbuf[id2].misc2==1)
+        if(itemsbuf[id2].misc2>0) //Small TF Piece
+	{
             getTriforce(id2);
+	}
         else
+	{
             getBigTri(id2);
+	}
     }
 }
 
@@ -22535,7 +22871,7 @@ void LinkClass::getTriforce(int id2)
 {
 		
 	PALETTE flash_pal;
-
+	int refill_frame = ( (itemsbuf[id2].misc5 > 0) ? itemsbuf[id2].misc5 : 88 );
 	
 	for(int i=0; i<256; i++)
 	{
@@ -22559,13 +22895,32 @@ void LinkClass::getTriforce(int id2)
 	}
     
 	sfx(itemsbuf[id2].playsound);
-	music_stop();
-    
-	if(itemsbuf[id2].misc1)
-		jukebox(itemsbuf[id2].misc1+ZC_MIDI_COUNT-1);
-	else
-		try_zcmusic((char*)moduledata.base_NSF_file,moduledata.tf_track, ZC_MIDI_TRIFORCE);
+	if ( !(itemsbuf[id2].flags & ITEM_FLAG11) ) music_stop();
 	
+	//If item flag six is enabled, and a sound is set to attributes[2], play that sound.
+	if ( (itemsbuf[id2].flags & ITEM_FLAG14) )
+	{
+		unsigned char playwav = itemsbuf[id2].misc3;
+		//zprint2("playwav is: %d\n", playwav);
+		sfx(playwav);
+		
+	}
+		
+	//itemsbuf[id2].flags & ITEM_FLAG9 : Don't dismiss Messages
+	//itemsbuf[id2].flags & ITEM_FLAG10 : Cutscene interrupts action script..
+	//itemsbuf[id2].flags & ITEM_FLAG11 : Don't change music.
+	//itemsbuf[id2].flags & ITEM_FLAG12 : Run Collect Script Script On Collection
+	//itemsbuf[id2].flags & ITEM_FLAG13 : Run Action Script On Collection
+	//itemsbuf[id2].flags & ITEM_FLAG14 : Play second sound (WAV) from Attributes[2] (misc2)
+	//itemsbuf[id2].flags & ITEM_FLAG15 : No MIDI
+    
+	if(!(itemsbuf[id2].flags & ITEM_FLAG15)) //No MIDI flag
+	{
+		if(itemsbuf[id2].misc1)
+			jukebox(itemsbuf[id2].misc1+ZC_MIDI_COUNT-1);
+		else
+			try_zcmusic((char*)moduledata.base_NSF_file,moduledata.tf_track, ZC_MIDI_TRIFORCE);
+	}
 	if(itemsbuf[id2].flags & ITEM_GAMEDATA)
 	{
 		game->lvlitems[dlevel]|=liTRIFORCE;
@@ -22575,13 +22930,70 @@ void LinkClass::getTriforce(int id2)
 	int x2=0;
 	int curtain_x=0;
 	int c=0;
-	
+	/*if ( (itemsbuf[id2].flags & ITEM_FLAG12) ) //Run collect script This happens w/o the flag. 
+		{
+			if(itemsbuf[id2].collect_script && !item_collect_doscript[id2])
+			{
+				//clear the item script stack for a new script
+				ri = &(itemCollectScriptData[id2]);
+				for ( int q = 0; q < 1024; q++ ) item_collect_stack[id2][q] = 0xFFFF;
+				ri->Clear();
+				//itemCollectScriptData[(id2 & 0xFFF)].Clear();
+				//for ( int q = 0; q < 1024; q++ ) item_collect_stack[(id2 & 0xFFF)][q] = 0;
+				//ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[id2].collect_script, ((id2 & 0xFFF)*-1));
+				if ( id2 > 0 && !item_collect_doscript[id2] ) //No collect script on item 0. 
+				{
+					item_collect_doscript[id2] = 1;
+					itemscriptInitialised[id2] = 0;
+					ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[id2].collect_script, ((id2)*-1));
+					//if ( !get_bit(quest_rules, qr_ITEMSCRIPTSKEEPRUNNING) )
+					FFCore.deallocateAllArrays(SCRIPT_ITEM,-(id2));
+				}
+				else if (!id2 && !item_collect_doscript[id2]) //item 0
+				{
+					item_collect_doscript[id2] = 1;
+					itemscriptInitialised[id2] = 0;
+					ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[id2].collect_script, COLLECT_SCRIPT_ITEM_ZERO);
+					//if ( !get_bit(quest_rules, qr_ITEMSCRIPTSKEEPRUNNING) )
+					FFCore.deallocateAllArrays(SCRIPT_ITEM,COLLECT_SCRIPT_ITEM_ZERO);
+				}
+			}
+		}
+		*/
 	do
 	{
+		
+		
+		if ( (itemsbuf[id2].flags & ITEM_FLAG13) ) //Run action script on collection.
+		{
+			if ( itemsbuf[id2].script )
+			{
+				if ( !item_doscript[id2] ) 
+				{
+					ri = &(itemScriptData[id2]);
+					for ( int q = 0; q < 1024; q++ ) item_stack[id2][q] = 0xFFFF;
+					ri->Clear();
+					item_doscript[id2] = 1;
+					itemscriptInitialised[id2] = 0;
+					ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[id2].script, id2);
+					FFCore.deallocateAllArrays(SCRIPT_ITEM,(id2));
+				}
+				else
+				{
+					if ( !(itemsbuf[id2].flags & ITEM_FLAG10) ) //Cutscene halts the script it resumes after cutscene.
+						ZScriptVersion::RunScript(SCRIPT_ITEM, itemsbuf[id2].script, id2); //if flag is off, run the script every frame of the cutscene.
+				}
+			}
+		}
+		//if ( itemsbuf[id2].misc2 == 2 ) //No cutscene; what if people used '2' on older quests?
+		if ( (itemsbuf[id2].flags & ITEM_FLAG12) ) //No cutscene
+		{
+			return;
+		}
 		if(f==40)
 		{
 			actiontype oldaction = action;
-			ALLOFF(true, false);
+			ALLOFF((!itemsbuf[id2].flags & ITEM_FLAG9), false);
 			action=oldaction;                                    // have to reset this flag
 			FFCore.setLinkAction(oldaction);
 		}
@@ -22636,7 +23048,7 @@ void LinkClass::getTriforce(int id2)
 	
 		if(itemsbuf[id2].flags & ITEM_GAMEDATA)
 		{
-			if(f==88)
+			if(f==refill_frame)
 			{
 				refill_what=REFILL_ALL;
 				refill_why=id2;
@@ -22644,7 +23056,7 @@ void LinkClass::getTriforce(int id2)
 				refill();
 			}
 	    
-			if(f==89)
+			if(f==(refill_frame+1))
 			{
 				if(refill())
 				{
@@ -22691,11 +23103,17 @@ void LinkClass::getTriforce(int id2)
 		//the subscreen appearing over the curtain effect should now be fixed in draw_screen
 		//so this is not necessary -DD
 		//put_passive_subscr(framebuf,&QMisc,0,passive_subscreen_offset,false,false);
-	
+		
+		//Run Triforce Script
 		advanceframe(true);
 		++f;
 	}
-	while(f<408 || midi_pos > 0 || (zcmusic!=NULL && zcmusic->position<800));   // 800 may not be just right, but it works
+	while
+	(
+		(f < ( (itemsbuf[id2].misc4 > 0) ? itemsbuf[id2].misc4 : 408)) 
+		|| (!(itemsbuf[id2].flags & ITEM_FLAG15) /*&& !(itemsbuf[id2].flags & ITEM_FLAG11)*/ && (midi_pos > 0)) 
+		|| (/*!(itemsbuf[id2].flags & ITEM_FLAG15) &&*/ !(itemsbuf[id2].flags & ITEM_FLAG11) && (zcmusic!=NULL) && (zcmusic->position<800) ) 
+	);   // 800 may not be just right, but it works
 
 	action=none; FFCore.setLinkAction(none);
 	holdclk=0;
@@ -22714,7 +23132,9 @@ void LinkClass::getTriforce(int id2)
 		dowarp(1,0); //side warp
 	}
 	else
-		playLevelMusic();
+	{
+		if ( !(itemsbuf[id2].flags & ITEM_FLAG11) ) playLevelMusic();
+	}
 }
 
 void red_shift()

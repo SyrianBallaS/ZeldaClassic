@@ -3285,6 +3285,7 @@ struct dmap
 #define dmfSIDEVIEW 			0x10000
 #define dmfLAYER3BG 			0x20000
 #define dmfLAYER2BG 			0x40000
+#define dmfNEWCELLARENEMIES 			0x80000
 
 
 #define OLDMAXCOMBOALIASES 256
@@ -4682,6 +4683,9 @@ extern void removeFromItemCache(int itemid);
 #define RUNSCRIPT_OK			0
 #define RUNSCRIPT_ERROR			1
 #define RUNSCRIPT_SELFDELETE	2
+
+#define until(n) while(!(n))
+#define unless(n) if(!(n))
 
 enum //Mapscr hardcodes for temp mapscrs
 {
