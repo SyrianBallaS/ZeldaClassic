@@ -45,7 +45,9 @@
 #include "zc_malloc.h"
 
 //Mem Debug
-#define VLD_FORCE_ENABLE 1
+#define VLD_FORCE_ENABLE 0
+#if (VLD_FORCE_ENABLE == 1)
 #include "../vld/src/vld.h"
+#endif // (VLD_FORCE_ENABLE == 1)
 #endif
 

@@ -346,7 +346,8 @@ namespace ZScript
 	
 	////////////////////////////////////////////////////////////////
 	// Function
-	
+	// Code implementing this function.
+	extern std::vector<Opcode*> globalOwnedCode;
 	class Function
 	{
 	public:
@@ -399,7 +400,6 @@ namespace ZScript
 		mutable optional<int> label;
 		int flags;
 
-		// Code implementing this function.
 		std::vector<Opcode*> ownedCode;
 		friend class ASTFuncDecl;
 	};

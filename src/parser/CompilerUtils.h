@@ -227,11 +227,13 @@ void appendElements(TargetContainer& target, SourceContainer const& source)
 
 // Delete all the elements in a container.
 template <typename Container>
-void deleteElements(Container const& container)
+void deleteElements(Container& container)
 {
-	for (typename Container::const_iterator it = container.begin();
-	     it != container.end(); ++it)
-		delete *it;
+	if (!container.empty()) {
+		for (size_t i = 0; i < container.size(); i++) {
+			DELETE_S(container.at(i));
+		}
+	}
 }
 
 // Return the only element of a container, or nothing.
@@ -269,11 +271,11 @@ std::vector<Value> getSeconds(Map const& map)
 }
 
 template <typename Map>
-void deleteSeconds(Map const& map)
+void deleteSeconds(Map& map)
 {
-	for (typename Map::const_iterator it = map.begin();
-	     it != map.end(); ++it)
-		delete it->second;
+	for (typename Map::iterator it = map.begin(); it != map.end(); ++it) {
+		DELETE_S(it->second);
+	}
 }
 
 // Overwrite all key/value pairs in source onto target.

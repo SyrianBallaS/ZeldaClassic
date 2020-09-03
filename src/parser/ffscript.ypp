@@ -1595,6 +1595,6 @@ namespace ZScript
 		}
 		fclose(yyin);
 		
-		return result;
+		return boost::movelib::unique_ptr<ASTFile>(result.release());
 	}
 };

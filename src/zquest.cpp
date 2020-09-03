@@ -82,6 +82,8 @@ void setZScriptVersion(int) { } //bleh...
 
 #include <fstream>
 
+#include "parser/ZScript.h" // needed to delete globalOwnedCode
+
 //Windows mmemory tools
 #ifdef _WIN32
 #include <windows.h>
@@ -25660,7 +25662,14 @@ int onCompileScript()
 				}
 				
 			}
-			
+            if (!ZScript::globalOwnedCode.empty()) {
+                for (size_t i = 0; i < ZScript::globalOwnedCode.size(); i++) {
+                    if (ZScript::globalOwnedCode.at(i)->getLabel() > -10000) {
+                        DELETE_S(ZScript::globalOwnedCode.at(i));
+                    }
+                }
+                ZScript::globalOwnedCode.clear();
+            }
 			
 			box_end(true);
 			if ( compile_success_sample > 0 )
@@ -25687,7 +25696,7 @@ int onCompileScript()
 				jwin_alert("Error","There were compile errors.","Compilation halted.",NULL,"O&K",NULL,'k',0,lfont);
 				break;
 			}
-			
+            
 			std::map<string, ZScript::ScriptType> &stypes = result->scriptTypes;
 			std::map<string, disassembled_script_data> &scripts = result->theScripts;
 			asffcscripts.clear();
@@ -25788,8 +25797,8 @@ int onCompileScript()
 			{
 				//fail
 			}
-			result.reset(NULL); //Delete, regardless of success or failure
-			
+			result.reset(); //Delete, regardless of success or failure
+            
 			//Need to manually delete the contents of the map here.
 			//2.53.x has this, to do it:
 			//for(map<string, disassembled_script_data>::iterator it = scripts.begin(); it != scripts.end(); it++)

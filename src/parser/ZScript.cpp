@@ -12,11 +12,15 @@
 extern FFScript FFCore;
 
 using namespace std;
+
+namespace ZScript {
+std::vector<Opcode*> globalOwnedCode;
+} // namespace ZScript
+
 using namespace ZScript;
 
 ////////////////////////////////////////////////////////////////
 // ZScript::Program
-
 Program::Program(ASTFile& root, CompileErrorHandler* errorHandler)
 	: root_(root), rootScope_(new RootScope(typeStore_))
 {
@@ -433,17 +437,27 @@ Function::Function(DataType const* returnType, string const& name,
 	: node(NULL), internalScope(NULL), thisVar(NULL),
 	  returnType(returnType), name(name), paramTypes(paramTypes), paramNames(paramNames),
 	  id(id), label(nullopt), flags(flags), internal_flags(internal_flags), hasPrefixType(false)
-{}
+{
+}
 
 Function::~Function()
 {
-	deleteElements(ownedCode);
+	// really hackish
+	if (!ownedCode.empty()) {
+		for (size_t i = 0; i < ownedCode.size(); i++) {
+			if (ownedCode.at(i)->getLabel() > -10000) {
+				DELETE_S(ownedCode.at(i));
+			}
+		}
+		ownedCode.clear();
+	}
 	deleteElements(paramNames);
 }
 
 vector<Opcode*> Function::takeCode()
 {
 	vector<Opcode*> code = ownedCode;
+	globalOwnedCode.insert(globalOwnedCode.end(), ownedCode.begin(), ownedCode.end());
 	ownedCode.clear();
 	return code;
 }
@@ -451,6 +465,7 @@ vector<Opcode*> Function::takeCode()
 void Function::giveCode(vector<Opcode*>& code)
 {
 	appendElements(ownedCode, code);
+	globalOwnedCode.insert(globalOwnedCode.end(), code.begin(), code.end());
 	//::deleteElements(code);
 	code.clear();
 }
